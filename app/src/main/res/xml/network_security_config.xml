@@ -3,5 +3,7 @@
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">maps.daum-img.net</domain>
         <domain includeSubdomains="true">3.143.147.178</domain>
+        <domain includeSubdomains="true">3.19.79.3</domain>
+<!--        3.19.79.3-->
     </domain-config>
 </network-security-config>
