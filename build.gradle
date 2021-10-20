@@ -20,7 +20,10 @@ allprojects {
     repositories {
         google()
         jcenter()
+//        mavenLocal() // 추가 by eunbin
         maven { url 'https://jitpack.io' }
+        //카카오 로그인 api
+        maven { url 'https://devrepo.kakao.com/nexus/content/groups/public/'}
     }
 }
 
