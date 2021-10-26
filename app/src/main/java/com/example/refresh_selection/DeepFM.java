@@ -57,73 +57,19 @@ public class DeepFM implements FederatedModel{
 ////        AcitivityTest = getTestDataSetIterator(test_data_path, N_SAMPLE_CLIENT_TEST);
 //    }
 
-    class TensorsSum extends SameDiffLambdaLayer {
-
-        @Override
-        public SDVariable defineLayer(SameDiff sameDiff, SDVariable layerInput) {
-            return  layerInput.sum("tensors_sum-" + UUID.randomUUID().toString(),false,1);
-        }
-
-        @Override
-        public InputType getOutputType(int layerIndex, InputType inputType) {
-            return inputType;
-        }
-    }
-
-    class TensorsSquare extends SameDiffLambdaLayer {
-
-        @Override
-        public SDVariable defineLayer(SameDiff sameDiff, SDVariable layerInput) {
-            return layerInput.mul("tensor_square-" + UUID.randomUUID().toString(),layerInput);
-        }
-
-        @Override
-        public InputType getOutputType(int layerIndex, InputType inputType) {
-            return inputType;
-        }
-    }
-
-    class Lambda1 extends SameDiffLambdaLayer {
-
-        @Override
-        public SDVariable defineLayer(SameDiff sameDiff, SDVariable layerInput) {
-            return layerInput.mul("lambda1-" + UUID.randomUUID().toString(),0.5);
-        }
-
-        @Override
-        public InputType getOutputType(int layerIndex, InputType inputType) {
-            return inputType;
-        }
-    }
-
-    class TensorMean extends SameDiffLambdaLayer {
-
-        @Override
-        public SDVariable defineLayer(SameDiff sameDiff, SDVariable layerInput) {
-            if(this.layerName.equals("concat_embed_2d") || this.layerName.equals("cat_embed_2d_genure_mean"))
-                return layerInput.mean("mean_pooling-" + UUID.randomUUID().toString(),true,1);
-            else
-                return layerInput.mean("mean_pooling-" + UUID.randomUUID().toString(),false,1);
-        }
-
-        @Override
-        public InputType getOutputType(int layerIndex, InputType inputType) {
-            return inputType;
-        }
-    }
 
     @Override
     public void buildModel(String modelzip_path) {
 
-        KerasLayer.registerLambdaLayer("sum_of_tensors",  new TensorsSum());
-        KerasLayer.registerLambdaLayer("square_of_tensors",  new TensorsSquare());
-        KerasLayer.registerLambdaLayer("lambda_2",  new Lambda1());
-        KerasLayer.registerLambdaLayer("cat_embed_2d_genure_mean", new TensorMean());
-        KerasLayer.registerLambdaLayer("embed_1d_mean",  new TensorMean());
+//        KerasLayer.registerLambdaLayer("sum_of_tensors", new TensorsSum());
+//        KerasLayer.registerLambdaLayer("square_of_tensors",  new TensorsSquare());
+//        KerasLayer.registerLambdaLayer("lambda_2",  new Lambda1());
+//        KerasLayer.registerLambdaLayer("cat_embed_2d_genure_mean", new TensorMean());
+//        KerasLayer.registerLambdaLayer("embed_1d_mean",  new TensorMean());
 
         //Load the model
         try {
-            File modelzip = new File(modelzip_path+ "/MyMultiLayerNetwork.zip");
+            File modelzip = new File(modelzip_path+ "/MyMultiLayerNetwork_beta6.zip");
             System.out.print(modelzip);
             model = ModelSerializer.restoreComputationGraph(modelzip);
 //            MultiLayerConfiguration neural_config2 = new NeuralNetConfiguration.Builder()

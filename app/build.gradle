@@ -87,27 +87,28 @@ dependencies {
 //    implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
-    implementation group: 'org.deeplearning4j', name: 'deeplearning4j-modelimport', version: '1.0.0-beta6'
-    implementation group: 'org.deeplearning4j', name: 'deeplearning4j-nlp', version: '1.0.0-beta6'
-    implementation group: 'org.deeplearning4j', name: 'deeplearning4j-nn', version: '1.0.0-beta6'
-    implementation group: 'org.deeplearning4j', name: 'deeplearning4j-datavec-iterators', version: '1.0.0-beta6'
-    implementation group: 'org.datavec', name: 'datavec-api', version: '1.0.0-beta6'
-    implementation group: 'org.deeplearning4j', name: 'deeplearning4j-common', version: '1.0.0-beta6'
+    implementation group: 'org.deeplearning4j', name: 'deeplearning4j-modelimport', version: '1.0.0-beta4'
+    implementation group: 'org.deeplearning4j', name: 'deeplearning4j-nlp', version: '1.0.0-beta4'
+    implementation group: 'org.deeplearning4j', name: 'deeplearning4j-nn', version: '1.0.0-beta4'
+    implementation group: 'org.deeplearning4j', name: 'deeplearning4j-datavec-iterators', version: '1.0.0-beta4'
+    implementation group: 'org.datavec', name: 'datavec-api', version: '1.0.0-beta4'
+    implementation group: 'org.deeplearning4j', name: 'deeplearning4j-common', version: '1.0.0-beta4'
 //    implementation 'org.nd4j:python4j-numpy:1.0.0-M1'
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.0-alpha1'
+    implementation group: 'org.nd4j', name: 'nd4j-tensorflow', version: '1.0.0-beta4'
 
 
-    implementation (group: 'org.deeplearning4j', name: 'deeplearning4j-core', version: '1.0.0-beta6') {
+    implementation (group: 'org.deeplearning4j', name: 'deeplearning4j-core', version: '1.0.0-beta4') {
         exclude group: 'org.bytedeco', module: 'opencv-platform'
         exclude group: 'org.bytedeco', module: 'leptonica-platform'
         exclude group: 'org.bytedeco', module: 'hdf5-platform'
     }
-    implementation group: 'org.nd4j', name: 'nd4j-native', version: '1.0.0-beta6'
-    implementation group: 'org.nd4j', name: 'nd4j-native', version: '1.0.0-beta6', classifier: "android-arm"
-    implementation group: 'org.nd4j', name: 'nd4j-native', version: '1.0.0-beta6', classifier: "android-arm64"
-    implementation group: 'org.nd4j', name: 'nd4j-native', version: '1.0.0-beta6', classifier: "android-x86"
-    implementation group: 'org.nd4j', name: 'nd4j-native', version: '1.0.0-beta6', classifier: "android-x86_64"
-    implementation group: 'org.nd4j', name: 'nd4j-native-platform', version: '1.0.0-beta6'
+    implementation group: 'org.nd4j', name: 'nd4j-native', version: '1.0.0-beta4'
+    implementation group: 'org.nd4j', name: 'nd4j-native', version: '1.0.0-beta4', classifier: "android-arm"
+    implementation group: 'org.nd4j', name: 'nd4j-native', version: '1.0.0-beta4', classifier: "android-arm64"
+    implementation group: 'org.nd4j', name: 'nd4j-native', version: '1.0.0-beta4', classifier: "android-x86"
+    implementation group: 'org.nd4j', name: 'nd4j-native', version: '1.0.0-beta4', classifier: "android-x86_64"
+    implementation group: 'org.nd4j', name: 'nd4j-native-platform', version: '1.0.0-beta4'
     implementation group: 'org.deeplearning4j', name: 'deeplearning4j-parallel-wrapper', version: '1.0.0-beta4'
     implementation group: 'org.bytedeco', name: 'openblas', version: '0.3.6-1.5.1'
     implementation group: 'org.bytedeco', name: 'openblas', version: '0.3.6-1.5.1', classifier: "android-arm"
