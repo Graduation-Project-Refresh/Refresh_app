@@ -1,31 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.refresh_selection"
-    android:targetSandboxVersion="1">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:targetSandboxVersion="1"
+    package="com.example.refresh_selection">
+
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <!--    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />-->
     <!--
  If your app targets Android 9 or lower, you can declare
          ACCESS_COARSE_LOCATION instead.
     -->
-    <uses-sdk
-        android:minSdkVersion="4"
-        android:targetSdkVersion="27" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <uses-sdk android:minSdkVersion="4"
+        android:targetSdkVersion="27"
+        tools:overrideLibrary="com.kakao.sdk.v2.user"
+        />
+<!--원래 targetsdkVersion=27-->
 
     <uses-feature
         android:name="android.hardware.bluetooth_le"
         android:required="true" />
 
+    <!-- android:extractNativeLibs="true"는 build error 해결하려고 추가 -->
+
     <application
+
+        android:usesCleartextTraffic="true"
+
+        android:extractNativeLibs="true"
+
+        android:requestLegacyExternalStorage="true"
+
         android:allowBackup="true"
         android:icon="@mipmap/ic_main"
         android:label="@string/app_name"
@@ -33,53 +47,49 @@
         android:roundIcon="@mipmap/ic_main_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar"
-        android:usesCleartextTraffic="true">
-        <activity android:name=".bottom_nav">
-
-             <intent-filter>
-             <action android:name="android.intent.action.MAIN" />
-             <category android:name="android.intent.category.LAUNCHER" />
-             </intent-filter>
-
-        </activity>
+        android:name=".GlobalApplication"
+        ><!--        카카오 로그인 sdk 초기화-->
 
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false" />
 
-        <activity android:name=".LoginActivity">
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
 
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter>-->
-        </activity>
-
-        <activity android:name=".RegisterJoin" />
-        <activity android:name=".Survey" />
-        <activity android:name=".Survey_place" />
-        <activity android:name=".MainActivity"></activity>
-        <activity android:name=".ModelClient" />
-        <activity android:name=".MapActivity">
-
-            <!-- <intent-filter> -->
-            <!-- <action android:name="android.intent.action.MAIN" /> -->
-            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-            <!-- </intent-filter> -->
-        </activity>
-
-        <receiver android:name=".AlarmRecevier" />
-
-        <service
-            android:name=".BluetoothLeService"
-            android:enabled="true" /> <!-- oreo중에 일부기기에 ERROR -->
-        <!-- volley라이브러리가 http통신 기술을 사용하기에..oreo 운영체제에서 동작을 막아버림 -->
-        <uses-library
-            android:name="org.apache.http.legacy"
-            android:required="false" /> <!-- 카카오맵 사용 -->
+        <!-- 카카오맵 사용 -->
         <meta-data
             android:name="com.kakao.sdk.AppKey"
-            android:value="4fd7fc1f51186abe0af6f8b9fb9dcd28" />
+            android:value="b63218adf0b8faca9858f34a6c960f29" />
+
+<!--앱화면-->
+<!--        메인레이아웃 화면-->
+        <activity android:name=".MainActivity_travel">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".MapActivity"></activity>
+
+<!--      카카오 로그인-->
+        <activity android:name=".Login_kakao"></activity>
+        <activity android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <!--Redirect URI: "kakao{NATIVE_APP_KEY}://oauth"-->
+                <data
+                    android:host="oauth"
+                    android:scheme="{b63218adf0b8faca9858f34a6c960f29}"/>
+            </intent-filter>
+        </activity>
+
+        <!--        oreo중에 일부기기에 ERROR-->
+        <!--        volley라이브러리가 http통신 기술을 사용하기에..oreo 운영체제에서 동작을 막아버림-->
+
+
     </application>
 
 </manifest>
