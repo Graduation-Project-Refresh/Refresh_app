@@ -16,6 +16,9 @@
  If your app targets Android 9 or lower, you can declare
          ACCESS_COARSE_LOCATION instead.
     -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+<!--    앱내부저장소에 파일 저장할때 필요한 것 -->
 
     <uses-sdk android:minSdkVersion="4"
         android:targetSdkVersion="27"
@@ -59,10 +62,14 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".MapActivity"></activity>
+        <activity android:name=".MapActivity">
+
+        </activity>
 
 <!--      카카오 로그인-->
-        <activity android:name=".Login_kakao"></activity>
+        <activity android:name=".Login_kakao">
+
+        </activity>
         <activity android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
@@ -74,6 +81,9 @@
                     android:host="oauth"
                     android:scheme="{b63218adf0b8faca9858f34a6c960f29}"/>
             </intent-filter>
+        </activity>
+        <activity android:name=".Calendar_java">
+
         </activity>
 
         <!--        oreo중에 일부기기에 ERROR-->

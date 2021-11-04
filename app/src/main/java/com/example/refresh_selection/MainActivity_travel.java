@@ -10,6 +10,8 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,9 +21,12 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-
 public class MainActivity_travel extends AppCompatActivity implements NavigationHost {
+    private String gender_age;
+
+    public String getGender_age() {
+        return gender_age;
+    }
 
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
@@ -39,6 +44,12 @@ public class MainActivity_travel extends AppCompatActivity implements Navigation
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trip_main);
+        Intent intent = getIntent();
+        if (intent.hasExtra("gender_age")) {
+            gender_age = intent.getStringExtra("gender_age");
+        } else {
+            Toast.makeText(this, "전달된 이름이 없습니다", Toast.LENGTH_SHORT).show();
+        }
 
         //GpsTracker 위치활용 동의
         if (checkLocationServicesStatus()) {
