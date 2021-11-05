@@ -29,9 +29,11 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.InputStreamVolleyRequest;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import android.os.AsyncTask;
@@ -94,9 +96,11 @@ public class MainActivity_travel extends AppCompatActivity implements Navigation
     private String responseString;
     private String return_task;
     private JSONObject response_json = null;
-    private String address = "3.19.79.3:8089/api/";
+    private String address = "http://18.218.2.153:8089/api/";
 
     private File mydir;
+
+    InputStreamVolleyRequest request;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,6 +135,7 @@ public class MainActivity_travel extends AppCompatActivity implements Navigation
             // first model build
             deepFM.buildModel("/storage/self/primary/Download/save_model");
             acc_f1 = deepFM.eval();
+            trainOneRound(currentRound, "tt", 1);
 
 //            AssetManager as = getResources().getAssets();
 //            InputStream is = as.open("MyMultiLayerNetwork_beta6.zip");
@@ -360,57 +365,99 @@ public class MainActivity_travel extends AppCompatActivity implements Navigation
 //
 
 
-    class DownloadFileFromURL extends AsyncTask<Void, String, String> {
+    class DownloadFileFromURL extends AsyncTask<Void, String, String> implements Response.Listener<byte[]>, Response.ErrorListener {
         @Override
         protected String doInBackground(Void... voids) {
             RequestQueue queue = Volley.newRequestQueue(MainActivity_travel.this);
-            String url = address+"getModel"; //서버url
-            StringRequest stringRequest = new StringRequest(
-                    Request.Method.GET,
-                    url, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    // 모델 받아와서 저장하는 거 있어야 됨
-                    try {
-                        JSONObject jsonResponse = new JSONObject(response.toString());
-                        int count;
-                        try {
-
-                            AssetManager as = getResources().getAssets();
-                            InputStream is = as.open("MyMultiLayerNetwork_beta6.zip");
-
-                            OutputStream output = new FileOutputStream("/storage/self/primary/Download/save_model/MyMultiLayerNetwork_beta6.zip");
-                            byte data[] = new byte[10240];
-
-                            while ((count = is.read(data)) != -1) {
-                                // writing data to file
-                                output.write(data, 0, count);
+            String mUrl= address+"getModel";
+            InputStreamVolleyRequest request = new InputStreamVolleyRequest(Request.Method.GET, mUrl,
+                    new Response.Listener<byte[]>() {
+                        @Override
+                        public void onResponse(byte[] response) {
+                            // TODO handle the response
+                            try {
+                                if (response!=null) {
+                                    FileOutputStream outputStream;
+                                    String name="get_model.zip";
+                                    outputStream = openFileOutput(name, Context.MODE_PRIVATE);
+                                    outputStream.write(response);
+                                    outputStream.close();
+//                                    Toast.makeText(this, "Download complete.", Toast.LENGTH_LONG).show();
+                                }
+                            } catch (Exception e) {
+                                // TODO Auto-generated catch block
+                                Log.d("KEY_ERROR", "UNABLE TO DOWNLOAD FILE");
+                                e.printStackTrace();
                             }
-
-                            // flushing output
-                            output.flush();
-
-                            // closing streams
-                            output.close();
-                            is.close();
-                        }catch (Exception e) {
-                            Log.e("Error: ", e.getMessage());
                         }
+                    } ,new Response.ErrorListener() {
 
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     error.printStackTrace();
                 }
-            });
+            }, null);
+            RequestQueue mRequestQueue = Volley.newRequestQueue(getApplicationContext(), new HurlStack());
+            mRequestQueue.add(request);
 
-            queue.add(stringRequest);
+//            String url = address+"getModel"; //서버url
+//            StringRequest stringRequest = new StringRequest(
+//                    Request.Method.GET,
+//                    url, new Response.Listener<String>() {
+//                @Override
+//                public void onResponse(byte[] response) {
+//                    // 모델 받아와서 저장하는 거 있어야 됨
+//                    try {
+//                        System.out.print("response --> : "+response);
+//                        JSONObject jsonResponse = new JSONObject(response.toString());
+////                        int count;
+////                        try {
+////
+////                            AssetManager as = getResources().getAssets();
+////                            InputStream is = as.open("MyMultiLayerNetwork_beta6.zip");
+////
+////                            OutputStream output = new FileOutputStream("/storage/self/primary/Download/save_model/MyMultiLayerNetwork_beta6.zip");
+////                            byte data[] = new byte[10240];
+////
+////                            while ((count = is.read(data)) != -1) {
+////                                // writing data to file
+////                                output.write(data, 0, count);
+////                            }
+////
+////                            // flushing output
+////                            output.flush();
+////
+////                            // closing streams
+////                            output.close();
+////                            is.close();
+////                        }catch (Exception e) {
+////                            Log.e("Error: ", e.getMessage());
+////                        }
+//
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }, new Response.ErrorListener() {
+//                @Override
+//                public void onErrorResponse(VolleyError error) {
+//                    error.printStackTrace();
+//                }
+//            });
+//
+//            queue.add(stringRequest);
 
             return "finish download";
+        }
+
+        @Override
+        public void onErrorResponse(VolleyError error) {
+
+        }
+
+        @Override
+        public void onResponse(byte[] response) {
+
         }
     }
 //
@@ -474,33 +521,12 @@ public class MainActivity_travel extends AppCompatActivity implements Navigation
             if(!check_file.exists()) {
                 boolean success = check_file.mkdir();
             }
-
             try {
-                int class_length = response_json.getInt("class_size");
-                JSONArray class_list = response_json.getJSONArray("class_list");
 
-                String data_download_path = "/storage/self/primary/Download/data_balance/client1_train";
-                String test_data_download_path = "/storage/self/primary/Download/data_balance/test";
-                File file = new File(data_download_path);
-                File[] datafolder = file.listFiles();
-                File test_file = new File(test_data_download_path);
-                File[] testdatafolder = test_file.listFiles();
+                deepFM = new DeepFM(MainActivity_travel.this);
 
-                int classsize = datafolder.length;
-                int trainSize = 0;
-                for(int i = 0; i < classsize; i++) {
-                    File datafile = new File(data_download_path + "/" + datafolder[i].getName());
-                    trainSize += datafile.listFiles().length;
-                }
-                int testSize = 0;
-                for(int i = 0; i < classsize; i++) {
-                    File datafile = new File(test_data_download_path + "/" + testdatafolder[i].getName());
-                    testSize += datafile.listFiles().length;
-                }
 
-                deepFM = new DeepFM(trainSize, testSize);
-
-            } catch (IOException | JSONException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
             return responseString;
@@ -620,30 +646,30 @@ public class MainActivity_travel extends AppCompatActivity implements Navigation
 //        }
 //    }
 //
-//    private String trainOneRound(int currentRound, String upload_url, int modelVersion) throws IOException {
-//        Log.d(TAG, "execute: train start!");
-//        long current_time = 0L;
-//        long train_time = 0L;
-//        try {
-//            current_time = System.currentTimeMillis();
-//            cnn_model.train(4);
-//            train_time = System.currentTimeMillis();
-//            Log.d("TRAINING TIME INFO", Long.toString((train_time - current_time)/1000));
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//        Log.d(TAG, "run: train finish!");
-//
-//        // save trained model
-//        String AndroidModelPath = "/storage/self/primary/Download/save_weight/";
-//
-//        cnn_model.saveSerializeModel("weight_" + mUsername + ".json");
-//
-//        Log.d("MODEL INFO", "Complete model save!");
-//        // upload to server trained model
-//        cnn_model.uploadTo(AndroidModelPath + "weight_" + mUsername + ".json", upload_url, client);
-//
-//        return Long.toString((train_time - current_time)/1000);
-//    }
+    private String trainOneRound(int currentRound, String upload_url, int modelVersion) throws IOException {
+        Log.d("trainOneRound", "execute: train start!");
+        long current_time = 0L;
+        long train_time = 0L;
+        try {
+            current_time = System.currentTimeMillis();
+            deepFM.train(4);
+            train_time = System.currentTimeMillis();
+            Log.d("TRAINING TIME INFO", Long.toString((train_time - current_time)/1000));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Log.d("trainOneRound", "run: train finish!");
+
+        // save trained model
+        String AndroidModelPath = "/storage/self/primary/Download/save_weight/";
+
+        deepFM.saveSerializeModel("weight_" + mUsername + ".json");
+
+        Log.d("MODEL INFO", "Complete model save!");
+        // upload to server trained model
+//        deepFM.uploadTo(AndroidModelPath + "weight_" + mUsername + ".json", upload_url, client);
+
+        return Long.toString((train_time - current_time)/1000);
+    }
 
 }
