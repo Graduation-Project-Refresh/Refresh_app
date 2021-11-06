@@ -12,6 +12,7 @@ import org.deeplearning4j.datasets.iterator.AsyncMultiDataSetIterator;
 import org.deeplearning4j.datasets.iterator.IteratorMultiDataSetIterator;
 import org.deeplearning4j.datasets.iterator.impl.ListDataSetIterator;
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.deeplearning4j.nn.graph.vertex.impl.InputVertex;
 import org.deeplearning4j.util.ModelSerializer;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -58,10 +59,6 @@ public class DeepFM implements FederatedModel {
     private String train_data_path = "/storage/self/primary/Download/data_balance/client1_train/new_input.csv";
     private String test_data_path = "/storage/self/primary/Download/data_balance/test/";
 
-//    private String mlsfc_vocab_path = "/storage/self/primary/Download/data_balance/client1_train/mlsfc_vocab.txt";
-//    private String mcate_nm_path = "/storage/self/primary/Download/data_balance/client1_train/mcate_nm_vocab.txt";
-//    private String day_path = "/storage/self/primary/Download/data_balance/client1_train/day_vocab.txt";
-//    private String sex_path = "/storage/self/primary/Download/data_balance/client1_train/Sex_vocab.txt";
     private String mlsfc_vocab_path = "mlsfc_vocab.txt";
     private String mcate_nm_path = "mcate_nm_vocab.txt";
     private String day_path = "day_vocab.txt";
@@ -227,93 +224,105 @@ public class DeepFM implements FederatedModel {
             int col_size = originalData.size();
             int row_size = ((ArrayList)(originalData.get(0))).size();
 
-//            DataSet dataSet = new DataSet();
+            float[][] mlsfc = new float[col_size][1];
+            float[][] mcate_nm = new float[col_size][1];
+            float[][] sex = new float[col_size][1];
+            float[][] age = new float[col_size][1];
+            float[][] month = new float[col_size][1];
+            float[][] time = new float[col_size][1];
+            float[][] day = new float[col_size][1];
+            float[][] fav_plc = new float[col_size][1];
+            float[][] clk = new float[col_size][1];
 
-            float[][] input_list = new float[row_size-1][col_size];
-            float[][] output_list = new float[1][col_size];
-
-//            INDArray input = Nd4j.create(col_size, row_size-1);
-//            INDArray label = Nd4j.create(col_size, 1);
-            INDArray input = Nd4j.create(row_size-1, col_size);
-            INDArray label = Nd4j.create(1, col_size);
-
-            for(int i = 0; i<col_size; i++){
-                for(int j = 0; j<row_size; j++){
-                    if(j == row_size -1){
-                        output_list[i][0] = Integer.parseInt(((ArrayList)originalData.get(i)).get(j).toString());
-                        label.putScalar(new int[]{col_size-1, 0},Double.parseDouble(((ArrayList)originalData.get(i)).get(j).toString()) );
-                    }else{
-                        input_list[i][j] = Integer.parseInt(((ArrayList)originalData.get(i)).get(j).toString());
-                        input.putScalar(new int[]{col_size-1,j},Double.parseDouble(((ArrayList)originalData.get(i)).get(j).toString()));
+            for(int i = 0; i < col_size; i++){
+                for(int j =0; j<row_size; j++){
+                    switch (i){
+                        case 0:
+                            mlsfc[i][0] = Float.parseFloat(((ArrayList)originalData.get(i)).get(j).toString());
+                            break;
+                        case 1:
+                            mcate_nm[i][0] = Float.parseFloat(((ArrayList)originalData.get(i)).get(j).toString());
+                            break;
+                        case 2:
+                            sex[i][0] = Float.parseFloat(((ArrayList)originalData.get(i)).get(j).toString());
+                            break;
+                        case 3:
+                            age[i][0] = Float.parseFloat(((ArrayList)originalData.get(i)).get(j).toString());
+                            break;
+                        case 4:
+                            month[i][0] = Float.parseFloat(((ArrayList)originalData.get(i)).get(j).toString());
+                            break;
+                        case 5:
+                            time[i][0] = Float.parseFloat(((ArrayList)originalData.get(i)).get(j).toString());
+                            break;
+                        case 6:
+                            day[i][0] = Float.parseFloat(((ArrayList)originalData.get(i)).get(j).toString());
+                            break;
+                        case 7:
+                            fav_plc[i][0] = Float.parseFloat(((ArrayList)originalData.get(i)).get(j).toString());
+                            break;
+                        case 8:
+                            clk[i][0] = Float.parseFloat(((ArrayList)originalData.get(i)).get(j).toString());
+                            break;
                     }
                 }
-
             }
-
-            RecordReader recordReader = new CSVRecordReader(1);
-            recordReader.initialize(new FileSplit(new File("/storage/self/primary/Download/data_balance/client1_train/new_input_encoded.csv")));
-
-
-//            DataSetIterator iterator = new RecordReaderDataSetIterator(recordReader, 4, labelIndex, 2);
-//
-//            MultiDataSet ds = (MultiDataSet) new DataSet(input, label).toMultiDataSet();
-//
-            DataSet multiDataSet = new DataSet(input, label);
-//            multiDataSet.setFeatures(input.getScalar());
-//            multiDataSet.setLabels(input.getColumns());
-
-//            multiDataSet.setFeatures(new INDArray[]{input.getColumn(0, true),input.getColumn(1, true),input.getColumn(2, true),input.getColumn(3, true),input.getColumn(4, true),input.getColumn(5, true),input.getColumn(6, true),input.getColumn(7, true)});
-//            multiDataSet.setLabels(new INDArray[]{label});
+            // 모델 빌드 (임시)
             File modelzip = new File("/storage/self/primary/Download/save_model/MyMultiLayerNetwork_beta6.zip");
             System.out.print(modelzip);
             model = ModelSerializer.restoreComputationGraph(modelzip);
+//            model.init();
 
-            model.init();
-            INDArray[] arrays = model.getInputs();
-            INDArray araay = model.getLayers()[0].input();
-            List<DataSet> multiDataSets = multiDataSet.asList();
-            ListDataSetIterator iter = new ListDataSetIterator(multiDataSets, 2048);
-            model.setInput(8,input);
-            model.fit(multiDataSet);
-            return iter;
-//            dataIter = new ListDataSetIterator(multiDataSets, 5);
-//            dataIter = new AsyncMultiDataSetIterator(iter,5);
-//            model.fit(multiDataSet);
+            INDArray mlsfc_ind = Nd4j.create(mlsfc);
+            INDArray mcate_nm_ind = Nd4j.create(mcate_nm);
+            INDArray sex_ind = Nd4j.create(sex);
+            INDArray age_ind = Nd4j.create(age);
+            INDArray month_ind = Nd4j.create(month);
+            INDArray time_ind = Nd4j.create(time);
+            INDArray day_ind = Nd4j.create(day);
+            INDArray fav_plc_ind = Nd4j.create(fav_plc);
+            INDArray clk_ind = Nd4j.create(clk);
 
-//            INDArray input = Nd4j.create(1,2);
-//            INDArray output = Nd4j.create(1,1);
-//            model.fit(new INDArray[]{input,input,input,input,input,input,input,input}, new INDArray[]{output});
+            System.out.print(model.summary());
+//            model.feedForward(new INDArray[]{age_ind, mlsfc_ind, mcate_nm_ind, sex_ind, month_ind, time_ind, day_ind, fav_plc_ind}, true);
 
-//            INDArray input_ndarray = Nd4j.create(input_list);
-//            INDArray input_ndarray2 = Nd4j.create(input_list[0]);
-//            INDArray output_ndarray = Nd4j.create(output_list);
-//            INDArray output_ndarray2 = Nd4j.create(output_list[0]);
-//            INDArray[] input = {input_ndarray.getColumn(0), input_ndarray.getColumn(0), input_ndarray.getColumn(0),input_ndarray.getColumn(0),input_ndarray.getColumn(0),input_ndarray.getColumn(0),input_ndarray.getColumn(0),input_ndarray.getColumn(0)};
-//            INDArray[] output = {output_ndarray.getColumn(0)};
-//            DataSet dataSet = new DataSet(input_ndarray, output_ndarray);
-//            MultiDataSet multiDataset = new MultiDataSet();
-//            multiDataset.setFeatures(input);
-//            multiDataset.setLabels(output);
-//            multiDataset
-//            List<DataSet> listDs = dataSet.asList();
-//            dataSet.dataSetBatches(4);
-//            model.fit(multiDataset);
-//            dataSet.get(0);
-//            dataset.get
+//            model.fit(new INDArray[]{age_ind, mlsfc_ind, mcate_nm_ind, sex_ind, month_ind, time_ind, day_ind, fav_plc_ind}, new INDArray[]{clk_ind});
+            MultiDataSet ds = new MultiDataSet(new INDArray[]{age_ind, mlsfc_ind, mcate_nm_ind, sex_ind, month_ind, time_ind, day_ind, fav_plc_ind}, new INDArray[]{clk_ind});
+            model.setInputs(age_ind, mlsfc_ind, mcate_nm_ind, sex_ind, month_ind, time_ind, day_ind, fav_plc_ind);
+            model.setLabels(clk_ind);
+            model.fit(); // 모델 train
 
-//            DataSet dataSet = new DataSet(input_ndarray, output_ndarray);
-////            dataSet.setFeatures(input_ndarray);
-////            dataSet.setLabels(output_ndarray);
-////            dataSet.addFeatureVector(input_ndarray);
-//            INDArray inputs = Nd4j.create(input_list[0]);
-//            dataSet.addFeatureVector(inputs);
-//            dataSet.dataSetBatches(4);
-//            List<DataSet> listDs = dataSet.asList();
-////            System.out.print(fucku);
 //
-//            dataIter = new ListDataSetIterator(listDs, 5);
-//            DataSet t = dataIter.next();
-//            System.out.print("Dataset : "+ t);
+//            RecordReader recordReader = new CSVRecordReader(1);
+//            recordReader.initialize(new FileSplit(new File("/storage/self/primary/Download/data_balance/client1_train/new_input_encoded.csv")));
+//
+//            DataSet multiDataSet = new DataSet(input, label);
+//
+////            multiDataSet.setFeatures(new INDArray[]{input.getColumn(0, true),input.getColumn(1, true),input.getColumn(2, true),input.getColumn(3, true),input.getColumn(4, true),input.getColumn(5, true),input.getColumn(6, true),input.getColumn(7, true)});
+////            multiDataSet.setLabels(new INDArray[]{label});
+
+////            dataIter = new ListDataSetIterator(multiDataSets, 5);
+////            dataIter = new AsyncMultiDataSetIterator(iter,5);
+////            model.fit(multiDataSet);
+//
+////            INDArray input = Nd4j.create(1,2);
+////            INDArray output = Nd4j.create(1,1);
+////            model.fit(new INDArray[]{input,input,input,input,input,input,input,input}, new INDArray[]{output});
+//
+////            INDArray input_ndarray = Nd4j.create(input_list);
+////            INDArray input_ndarray2 = Nd4j.create(input_list[0]);
+////            INDArray output_ndarray = Nd4j.create(output_list);
+////            INDArray output_ndarray2 = Nd4j.create(output_list[0]);
+////            INDArray[] input = {input_ndarray.getColumn(0), input_ndarray.getColumn(0), input_ndarray.getColumn(0),input_ndarray.getColumn(0),input_ndarray.getColumn(0),input_ndarray.getColumn(0),input_ndarray.getColumn(0),input_ndarray.getColumn(0)};
+////            INDArray[] output = {output_ndarray.getColumn(0)};
+////            DataSet dataSet = new DataSet(input_ndarray, output_ndarray);
+////            MultiDataSet multiDataset = new MultiDataSet();
+////            multiDataset.setFeatures(input);
+////            multiDataset.setLabels(output);
+////
+////            dataIter = new ListDataSetIterator(listDs, 5);
+////            DataSet t = dataIter.next();
+////            System.out.print("Dataset : "+ t);
 
         } catch (InterruptedException e) {
             e.printStackTrace();

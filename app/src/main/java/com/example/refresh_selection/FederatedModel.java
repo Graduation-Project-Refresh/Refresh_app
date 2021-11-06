@@ -1,7 +1,9 @@
 package com.example.refresh_selection;
 
-import org.nd4j.evaluation.classification.Evaluation;
-import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+import org.deeplearning4j.datasets.iterator.AsyncMultiDataSetIterator;
+import org.deeplearning4j.datasets.iterator.IteratorMultiDataSetIterator;
+import org.deeplearning4j.datasets.iterator.impl.ListDataSetIterator;
+import org.nd4j.linalg.dataset.api.iterator.MultiDataSetIterator;
 
 import java.io.IOException;
 
@@ -20,5 +22,5 @@ public interface FederatedModel {
 
     void uploadTo(String upload_path, String upload_url) throws IOException;
 
-    DataSetIterator getDataSetIterator(String folderPath, int nSamples) throws IOException;
+    ListDataSetIterator getDataSetIterator(String filePath) throws IOException;
 }

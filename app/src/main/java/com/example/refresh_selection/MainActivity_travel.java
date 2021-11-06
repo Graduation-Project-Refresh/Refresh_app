@@ -134,7 +134,7 @@ public class MainActivity_travel extends AppCompatActivity implements Navigation
 
             // first model build
             deepFM.buildModel("/storage/self/primary/Download/save_model");
-            acc_f1 = deepFM.eval();
+//            acc_f1 = deepFM.eval();
             trainOneRound(currentRound, "tt", 1);
 
 //            AssetManager as = getResources().getAssets();
@@ -517,9 +517,15 @@ public class MainActivity_travel extends AppCompatActivity implements Navigation
 
             String Output_file_path = "/storage/self/primary/Download/save_model";
             File check_file = new File(Output_file_path);
+            String data_path = "/storage/self/primary/Download/data_balance/client1_train/";
+            File check_file_file = new File(data_path);
             // 맨 처음에 서버에서 모델 받아오는거. 서버에서 모델 받아와서 Output_file_path에 저장함
             if(!check_file.exists()) {
                 boolean success = check_file.mkdir();
+            }
+            if(!check_file_file.exists()){
+                boolean success = check_file_file.mkdirs();
+
             }
             try {
 
