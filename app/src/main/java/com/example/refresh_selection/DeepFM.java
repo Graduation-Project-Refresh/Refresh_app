@@ -5,71 +5,45 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.util.Log;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import org.datavec.api.records.Record;
 import org.datavec.api.split.FileSplit;
 import org.datavec.api.records.reader.RecordReader;
 import org.datavec.api.records.reader.impl.csv.CSVRecordReader;
-import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator;
-import org.deeplearning4j.datasets.iterator.INDArrayDataSetIterator;
+import org.deeplearning4j.datasets.iterator.AsyncMultiDataSetIterator;
+import org.deeplearning4j.datasets.iterator.IteratorMultiDataSetIterator;
 import org.deeplearning4j.datasets.iterator.impl.ListDataSetIterator;
-import org.deeplearning4j.nn.api.Layer;
-import org.deeplearning4j.nn.api.OptimizationAlgorithm;
-import org.deeplearning4j.nn.conf.ComputationGraphConfiguration;
-import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
-import org.deeplearning4j.nn.conf.distribution.NormalDistribution;
-import org.deeplearning4j.nn.conf.layers.CenterLossOutputLayer;
-import org.deeplearning4j.nn.conf.layers.DenseLayer;
-import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.graph.ComputationGraph;
-import org.deeplearning4j.nn.weights.WeightInit;
 import org.deeplearning4j.util.ModelSerializer;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.nd4j.evaluation.classification.Evaluation;
-import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
+import org.nd4j.linalg.dataset.MultiDataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 
-import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
-import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
+import org.nd4j.linalg.dataset.api.iterator.MultiDataSetIterator;
 import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.linalg.learning.config.Adam;
-import org.nd4j.linalg.learning.config.Nesterovs;
-import org.nd4j.linalg.learning.config.NoOp;
-import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.io.FileReader;
-import java.util.Random;
-import java.util.UUID;
-
-import kotlin.jvm.internal.Intrinsics;
-
-import org.datavec.api.writable.Writable;
 
 import java.util.List;
-import java.util.Collection;
 //import org.datavec.spark.functions.LineRecordReaderFunction;
 
 
 public class DeepFM implements FederatedModel {
     private static final String TAG = "DeepFM";
     private static final int BATCH_SIZE = 50;
-    private static final int labelIndex = 7;
+    private static final int labelIndex = 8;
     private static final int N_EPOCHS = 1;
     private static final int rngSeed = 42;
 
@@ -93,7 +67,7 @@ public class DeepFM implements FederatedModel {
     private String day_path = "day_vocab.txt";
     private String sex_path = "Sex_vocab.txt";
 
-    private DataSetIterator AcitivityTrain;
+    private ListDataSetIterator AcitivityTrain;
     private DataSetIterator AcitivityTest;
     private Context context;
 
@@ -146,7 +120,7 @@ public class DeepFM implements FederatedModel {
     @Override
     public void train(int numEpochs) throws InterruptedException {
         Log.d(TAG, " start fit!");
-        model.fit(AcitivityTrain, numEpochs);
+        model.fit(AcitivityTrain);
     }
 
     public String eval() {
@@ -214,7 +188,7 @@ public class DeepFM implements FederatedModel {
     }
 
     @Override
-    public DataSetIterator getDataSetIterator(String filePath) throws IOException {
+    public ListDataSetIterator getDataSetIterator(String filePath) throws IOException {
 
         // txt 파일 읽어서 리스트나 dictionary로 저자해놔야함
         Hashtable mlsfc_vocab_table = get_vocab(mlsfc_vocab_path);
@@ -225,7 +199,7 @@ public class DeepFM implements FederatedModel {
 
         //Load the training data:
         RecordReader rr = new CSVRecordReader(1);
-        DataSetIterator dataIter = null;
+        AsyncMultiDataSetIterator dataIter = null;
         try {
             rr.initialize(new FileSplit(new File(filePath)));
             ArrayList originalData = new ArrayList();
@@ -253,45 +227,98 @@ public class DeepFM implements FederatedModel {
             int col_size = originalData.size();
             int row_size = ((ArrayList)(originalData.get(0))).size();
 
-            DataSet dataSet = new DataSet();
+//            DataSet dataSet = new DataSet();
 
-            int[][] input_list = new int[col_size][row_size-1];
-            int[][] output_list = new int[col_size][1];
+            float[][] input_list = new float[row_size-1][col_size];
+            float[][] output_list = new float[1][col_size];
+
+//            INDArray input = Nd4j.create(col_size, row_size-1);
+//            INDArray label = Nd4j.create(col_size, 1);
+            INDArray input = Nd4j.create(row_size-1, col_size);
+            INDArray label = Nd4j.create(1, col_size);
+
             for(int i = 0; i<col_size; i++){
                 for(int j = 0; j<row_size; j++){
                     if(j == row_size -1){
                         output_list[i][0] = Integer.parseInt(((ArrayList)originalData.get(i)).get(j).toString());
+                        label.putScalar(new int[]{col_size-1, 0},Double.parseDouble(((ArrayList)originalData.get(i)).get(j).toString()) );
                     }else{
                         input_list[i][j] = Integer.parseInt(((ArrayList)originalData.get(i)).get(j).toString());
+                        input.putScalar(new int[]{col_size-1,j},Double.parseDouble(((ArrayList)originalData.get(i)).get(j).toString()));
                     }
                 }
 
             }
 
-            INDArray input_ndarray = Nd4j.createFromArray(input_list);
-            INDArray output_ndarray = Nd4j.createFromArray(output_list);
+            RecordReader recordReader = new CSVRecordReader(1);
+            recordReader.initialize(new FileSplit(new File("/storage/self/primary/Download/data_balance/client1_train/new_input_encoded.csv")));
+
+
+//            DataSetIterator iterator = new RecordReaderDataSetIterator(recordReader, 4, labelIndex, 2);
+//
+//            MultiDataSet ds = (MultiDataSet) new DataSet(input, label).toMultiDataSet();
+//
+            DataSet multiDataSet = new DataSet(input, label);
+//            multiDataSet.setFeatures(input.getScalar());
+//            multiDataSet.setLabels(input.getColumns());
+
+//            multiDataSet.setFeatures(new INDArray[]{input.getColumn(0, true),input.getColumn(1, true),input.getColumn(2, true),input.getColumn(3, true),input.getColumn(4, true),input.getColumn(5, true),input.getColumn(6, true),input.getColumn(7, true)});
+//            multiDataSet.setLabels(new INDArray[]{label});
+            File modelzip = new File("/storage/self/primary/Download/save_model/MyMultiLayerNetwork_beta6.zip");
+            System.out.print(modelzip);
+            model = ModelSerializer.restoreComputationGraph(modelzip);
+
+            model.init();
+            INDArray[] arrays = model.getInputs();
+            INDArray araay = model.getLayers()[0].input();
+            List<DataSet> multiDataSets = multiDataSet.asList();
+            ListDataSetIterator iter = new ListDataSetIterator(multiDataSets, 2048);
+            model.setInput(8,input);
+            model.fit(multiDataSet);
+            return iter;
+//            dataIter = new ListDataSetIterator(multiDataSets, 5);
+//            dataIter = new AsyncMultiDataSetIterator(iter,5);
+//            model.fit(multiDataSet);
+
+//            INDArray input = Nd4j.create(1,2);
+//            INDArray output = Nd4j.create(1,1);
+//            model.fit(new INDArray[]{input,input,input,input,input,input,input,input}, new INDArray[]{output});
+
+//            INDArray input_ndarray = Nd4j.create(input_list);
+//            INDArray input_ndarray2 = Nd4j.create(input_list[0]);
+//            INDArray output_ndarray = Nd4j.create(output_list);
+//            INDArray output_ndarray2 = Nd4j.create(output_list[0]);
+//            INDArray[] input = {input_ndarray.getColumn(0), input_ndarray.getColumn(0), input_ndarray.getColumn(0),input_ndarray.getColumn(0),input_ndarray.getColumn(0),input_ndarray.getColumn(0),input_ndarray.getColumn(0),input_ndarray.getColumn(0)};
+//            INDArray[] output = {output_ndarray.getColumn(0)};
 //            DataSet dataSet = new DataSet(input_ndarray, output_ndarray);
+//            MultiDataSet multiDataset = new MultiDataSet();
+//            multiDataset.setFeatures(input);
+//            multiDataset.setLabels(output);
+//            multiDataset
 //            List<DataSet> listDs = dataSet.asList();
+//            dataSet.dataSetBatches(4);
+//            model.fit(multiDataset);
+//            dataSet.get(0);
+//            dataset.get
 
-//            DataSet dataSet = new DataSet();
-            dataSet.setFeatures(input_ndarray);
-            dataSet.setLabels(output_ndarray);
-            dataSet.dataSetBatches(4);
-            List<DataSet> listDs = dataSet.asList();
-//            System.out.print(fucku);
+//            DataSet dataSet = new DataSet(input_ndarray, output_ndarray);
+////            dataSet.setFeatures(input_ndarray);
+////            dataSet.setLabels(output_ndarray);
+////            dataSet.addFeatureVector(input_ndarray);
+//            INDArray inputs = Nd4j.create(input_list[0]);
+//            dataSet.addFeatureVector(inputs);
+//            dataSet.dataSetBatches(4);
+//            List<DataSet> listDs = dataSet.asList();
+////            System.out.print(fucku);
+//
+//            dataIter = new ListDataSetIterator(listDs, 5);
+//            DataSet t = dataIter.next();
+//            System.out.print("Dataset : "+ t);
 
-            dataIter = new ListDataSetIterator(listDs, 5);
-            DataSet t = dataIter.next();
-            System.out.print("Dataset : "+ t);
-//            DataSet qq = dataIter.next();
-//            System.out.print("hear ->" + dataIter.next());
-            log.debug(dataIter.next().toString());
-//            JavaRDD<List<Writable>> out = linesRdd.map(new LineRecordReaderFunction(rr));
-//            List<List<Writable>> outList = out.collect();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return dataIter;
+        return null;
     }
 
     public void data_encode() {
