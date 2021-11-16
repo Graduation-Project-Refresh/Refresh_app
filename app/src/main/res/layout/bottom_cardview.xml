@@ -11,28 +11,26 @@
         android:layout_gravity="center"
         android:background="@color/white"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="220dp"
         android:orientation="vertical"
-        android:padding="10dp">
+        android:padding="5dp">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="200dp"
             android:orientation="horizontal"
-            android:padding="10dp">
+            android:padding="5dp">
             <ImageView
-                android:background="@drawable/bottom_img_round_corner"
                 android:id="@+id/btmIV"
                 android:layout_width="120dp"
-                android:layout_height="130dp"
-                android:src="@drawable/account_circle_deactivate"
+                android:layout_height="140dp"
                 android:layout_marginLeft="30dp"
                 android:layout_gravity="left"/>
             <LinearLayout
                 android:layout_marginLeft="30dp"
                 android:padding="2dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:orientation="vertical">
                 <TextView
                     android:id="@+id/bottom_space_name"
@@ -57,15 +55,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/black"
-                        android:text="거리"
+                        android:text="카테고리"
                         />
                     <TextView
                         android:layout_marginLeft="10dp"
                         android:id="@+id/bottom_space_distance"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="70dp"
+                        android:layout_height="20dp"
                         android:textColor="@color/black"
-                        android:background="@drawable/bottom_cardview_textview"
                         android:text=" 거리"
                         />
                 </LinearLayout>
@@ -79,50 +76,50 @@
                         android:layout_height="wrap_content"
                         android:textColor="@color/black"
                         android:text="가격"/>
-                    <TextView
-                        android:layout_marginLeft="10dp"
-                        android:id="@+id/bottom_space_price"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/black"
-                        android:background="@drawable/bottom_cardview_textview"
-                        android:text=" 가격"
-                        />
+                        <TextView
+                            android:layout_marginLeft="10dp"
+                            android:id="@+id/bottom_space_price"
+                            android:layout_width="70dp"
+                            android:layout_height="20dp"
+                            android:textColor="@color/black"
+                            android:text=" 가격"
+                            />
+
+
+
+
                 </LinearLayout>
                 <LinearLayout
                     android:padding="5dp"
-                    android:layout_width="100dp"
+                    android:layout_width="140dp"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
+                    android:layout_gravity="left"
                     android:orientation="horizontal">
-                    <RadioGroup
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+
                         <ImageButton
+                            android:background="#00000000"
                             android:id="@+id/like_bt"
-                            android:background="@color/white"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:src="@drawable/unactivated_like"/>
                         <ImageButton
+                            android:background="#00000000"
                             android:id="@+id/dislike_bt"
                             android:layout_marginLeft="15dp"
-                            android:background="@color/white"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:src="@drawable/unactivated_dislike"/>
-                    </RadioGroup>
 
 
                 </LinearLayout>
             </LinearLayout>
+
         </LinearLayout>
         <ImageView
             android:layout_gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src ="@drawable/long_line"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:src="#d3d3d3"
             />
     </LinearLayout>
 

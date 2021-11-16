@@ -44,12 +44,12 @@ public class MainActivity_travel extends AppCompatActivity implements Navigation
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trip_main);
-        Intent intent = getIntent();
-        if (intent.hasExtra("gender_age")) {
-            gender_age = intent.getStringExtra("gender_age");
-        } else {
-            Toast.makeText(this, "전달된 이름이 없습니다", Toast.LENGTH_SHORT).show();
-        }
+//        Intent intent = getIntent();
+//        if (intent.hasExtra("gender_age")) {
+//            gender_age = intent.getStringExtra("gender_age");
+//        } else {
+//            Toast.makeText(this, "전달된 이름이 없습니다", Toast.LENGTH_SHORT).show();
+//        }
 
         //GpsTracker 위치활용 동의
         if (checkLocationServicesStatus()) {

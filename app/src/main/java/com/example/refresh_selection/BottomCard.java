@@ -5,14 +5,18 @@ public class BottomCard {
     private String bottom_space_description;
     private String distance;
     private String price;
-    private int img;
+    private String img;
+    private String mlsfc;
+    private String mcate;
 
-    BottomCard(String btm_space_name,String btm_space_description,String dis,String price, int img){
+    BottomCard(String btm_space_name,String btm_space_description,String dis,String price, String img,String mlsfc, String mcate){
         this.bottom_space_name=btm_space_name;
         this.bottom_space_description=btm_space_description;
         this.distance=dis;
         this.price=price;
         this.img=img;
+        this.mlsfc=mlsfc;
+        this.mcate=mcate;
     }
 
     public String getBottom_space_name() {
@@ -47,11 +51,27 @@ public class BottomCard {
         this.price = price;
     }
 
-    public int getImg() {
+    public String getImg() {
         return img;
     }
 
-    public void setImg(int img) {
+    public void setImg(String img) {
         this.img = img;
+    }
+
+    public String getMlsfc() {
+        return mlsfc;
+    }
+
+    public void setMlsfc(String mlsfc) {
+        this.mlsfc = mlsfc;
+    }
+
+    public String getMcate() {
+        return mcate;
+    }
+
+    public void setMcate(String mcate) {
+        this.mcate = mcate;
     }
 }

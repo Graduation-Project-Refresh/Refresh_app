@@ -30,6 +30,7 @@ public class ScheduleCardAdapter extends RecyclerView.Adapter<ScheduleCardAdapte
     @Override
     public void onBindViewHolder(@NonNull ScheduleCardAdapter.Viewholder holder, int position) {
         ScheduleCard sc=ScheduleCardArrayList.get(position);
+        String s=sc.getSchedule_date();
         holder.schedule_date.setText(sc.getSchedule_date());
         //뷰는 뭐로 채워야할까?
     }
@@ -44,7 +45,8 @@ public class ScheduleCardAdapter extends RecyclerView.Adapter<ScheduleCardAdapte
         private View schedule_view;
         public Viewholder(@NonNull View itemView) {
             super(itemView);
-//            schedule_date=itemView.findViewById();
+            schedule_date=itemView.findViewById(R.id.sc_TV);
+            schedule_view=itemView.findViewById(R.id.sc_view);
         }
     }
 }

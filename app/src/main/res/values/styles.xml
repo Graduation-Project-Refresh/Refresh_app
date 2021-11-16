@@ -35,5 +35,7 @@
         <item name="shapeAppearance">@style/ModalBottomSheet</item>
     </style>
 
-
+    <style name="CustomTextAppearance">
+        <item name="android:textColor">@color/black</item>
+    </style>
 </resources>

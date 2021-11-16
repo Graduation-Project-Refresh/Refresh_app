@@ -1,7 +1,6 @@
 package com.example.refresh_selection;
 
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,8 +21,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
@@ -49,7 +46,7 @@ public class FragmentMain extends Fragment {
             @Override
             public void onClick(View view)
             {
-                Intent intent =new Intent(mainview.getContext(),Calendar_java.class);
+                Intent intent =new Intent(mainview.getContext(),Calendar_java2.class);
                 startActivity(intent);
             }
         });
@@ -100,10 +97,6 @@ public class FragmentMain extends Fragment {
     public void makeSpaceCard(ViewGroup mainview) {
         spaceRV = (RecyclerView) mainview.findViewById(R.id.idRVSpace);//main_activity_3
         spaceRV.setHasFixedSize(true);
-//        spaceCardArrayList.add(new SpaceCard("대청호1","호수가 아름답다.","여기는 큰 호수이다.",R.drawable.test_img));
-//        spaceCardArrayList.add(new SpaceCard("대청호2","호수가 아름답다.","여기는 큰 호수이다.",R.drawable.test_img));
-//        spaceCardArrayList.add(new SpaceCard("대청호3","호수가 아름답다.","여기는 큰 호수이다.",R.drawable.test_img));
-
         spaceCardAdapter =new SpaceCardAdapter(mainview.getContext(),spaceCardArrayList);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mainview.getContext(), LinearLayoutManager.VERTICAL, false);
         spaceRV.setLayoutManager(linearLayoutManager);
@@ -112,7 +105,7 @@ public class FragmentMain extends Fragment {
 
     private void requestSpace(ViewGroup mainview) {//서버에 장소 좌표 요청하는 메소드
         RequestQueue queue = Volley.newRequestQueue(getContext());
-        String url = "http://18.218.2.153:8089//api/getMainPlaces";//서버url
+        String url = "http://3.19.218.150:8089//api/getMainPlaces";//서버url
         JSONArray testjson = new JSONArray();//서버에게 전달 할 값을 json으로 보냄
 //        try {
 //            testjson.put(0,area);
@@ -126,23 +119,22 @@ public class FragmentMain extends Fragment {
                 try {
                     for(int i=0; i<response.length();i++){
                         JSONObject place =(JSONObject)response.get(i);
+//                        String mlsfc=place.getString("mlsfc");
+//                        String mcate=place.getString("mcate_nm");
                         String name = place.getString("name");
                         String descript=place.getString("description");
                         String tag = place.getString("tag");
                         String ImgSrc = place.getString("imgSrc");
+                        String photoUrl="http://3.19.218.150/"+ImgSrc;
+                        spaceCardArrayList.add(new SpaceCard(name,descript,tag,photoUrl,"관광지","유명관광지"));
+//                        spaceCardArrayList.add(new SpaceCard(name,descript,tag,photoUrl,mlsfc,mcate));
 
-                        spaceCardArrayList.add(new SpaceCard(name,descript,tag,LoadImageFromWebOperations(ImgSrc,i+"")));
                     }
-                    spaceRV = (RecyclerView) mainview.findViewById(R.id.idRVSpace);//main_activity_3
-                    spaceRV.setHasFixedSize(true);
 
-                    spaceCardAdapter =new SpaceCardAdapter(mainview.getContext(),spaceCardArrayList);
-                    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mainview.getContext(), LinearLayoutManager.VERTICAL, false);
-                    spaceRV.setLayoutManager(linearLayoutManager);
-                    spaceRV.setAdapter(spaceCardAdapter);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                makeSpaceCard(mainview);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -153,13 +145,5 @@ public class FragmentMain extends Fragment {
         request.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         queue.add(request);
     }
-    public static Drawable LoadImageFromWebOperations(String url,String srcName) {
-        try {
-            InputStream is = (InputStream) new URL(url).getContent();
-            Drawable d = Drawable.createFromStream(is, "res/drawable/"+srcName);
-            return d;
-        } catch (Exception e) {
-            return null;
-        }
-    }
+
 }
